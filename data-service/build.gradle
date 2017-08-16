@@ -1,3 +1,65 @@
+plugins {
+    id "io.spring.dependency-management" version "1.0.3.RELEASE"
+    id "java"
+}
+
 description "Implementation of the Blox DataService"
 
-apply plugin: 'java'
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.173'
+    }
+}
+
+dependencies {
+    compileOnly('org.projectlombok:lombok:1.16.18')
+
+    compile(
+            'com.amazonaws:aws-java-sdk-dynamodb',
+            'com.amazonaws:aws-lambda-java-log4j:1.+',
+            'org.slf4j:slf4j-log4j12:1.7.+'
+    )
+
+    testCompile(
+            'junit:junit:4.12',
+            'org.mockito:mockito-core:1.+'
+    )
+}
+
+sourceSets {
+    integTest {
+        java.srcDir file('src/integTest/java')
+        resources.srcDir file('src/integTest/resources')
+    }
+}
+
+dependencies {
+    integTestCompile sourceSets.main.output
+    integTestCompile sourceSets.test.output
+
+    integTestCompile configurations.compile
+    integTestCompile configurations.testCompile
+
+    integTestRuntime configurations.runtime
+    integTestRuntime configurations.testRuntime
+}
+
+task integTests(type: Test) {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = 'Runs the integration tests.'
+
+    maxHeapSize = '1024m'
+
+    testClassesDirs = sourceSets.integTest.output.classesDirs
+    classpath = sourceSets.integTest.runtimeClasspath
+
+    binResultsDir = file("$buildDir/integration-test-results/binary/integTest")
+}
+
+test {
+    exclude '**/*IntegTest'
+}

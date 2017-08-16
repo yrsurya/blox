@@ -1,6 +1,8 @@
-description 'Shared POJOs and interfaces for the Blox DataService'
+plugins {
+    id "java"
+}
 
-apply plugin: 'java'
+description 'Shared POJOs and interfaces for the Blox DataService'
 
 repositories {
     mavenCentral()

@@ -1,6 +1,8 @@
-description 'Blox DataService Client'
+plugins {
+    id "java"
+}
 
-apply plugin: 'java'
+description 'Blox DataService Client'
 
 repositories {
     mavenCentral()
