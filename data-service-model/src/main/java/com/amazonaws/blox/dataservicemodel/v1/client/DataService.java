@@ -22,6 +22,8 @@ import com.amazonaws.blox.dataservicemodel.v1.exception.InvalidParameterExceptio
 import com.amazonaws.blox.dataservicemodel.v1.exception.ServiceException;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentResponse;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentRequest;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.StartDeploymentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.StartDeploymentResponse;
 
@@ -30,6 +32,10 @@ public interface DataService {
   /** Creates an environment record. */
   CreateEnvironmentResponse createEnvironment(CreateEnvironmentRequest request)
       throws EnvironmentExistsException, InvalidParameterException, ServiceException;
+
+  /** Gets an environment record. */
+  GetEnvironmentResponse getEnvironment(GetEnvironmentRequest request)
+      throws EnvironmentNotFoundException, InvalidParameterException, ServiceException;
 
   /** Creates a deployment record which asynchronously starts a deployment. */
   StartDeploymentResponse startDeployment(StartDeploymentRequest request)

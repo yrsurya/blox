@@ -14,17 +14,21 @@
  */
 package com.amazonaws.blox.dataservice.storage.model;
 
+import com.amazonaws.blox.dataservice.model.EnvironmentHealth;
+import com.amazonaws.blox.dataservice.model.EnvironmentStatus;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
+import java.time.Instant;
+import java.util.Set;
+import java.util.StringJoiner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.Instant;
-import java.util.Set;
 
 @DynamoDBTable(tableName = "DaemonEnvironments")
 @Data
@@ -33,21 +37,45 @@ import java.util.Set;
 @AllArgsConstructor
 public class DaemonEnvironmentDDBRecord {
 
-  public static final String ACCOUNT_ID_HASH_KEY = "accountId";
-  public static final String ENVIRONMENT_NAME_SORT_KEY = "environmentName";
+  public static final String ENVIRONMENT_ACCOUNTID_HASH_KEY = "environmentNameAccountId";
+  public static final String ENVIRONMENT_VERSION = "environmentVersion";
 
   @Deprecated
   public DaemonEnvironmentDDBRecord() {
     // Needed by dynamodb mapper
   }
 
-  @DynamoDBHashKey(attributeName = ACCOUNT_ID_HASH_KEY)
-  private String accountId;
+  public static DaemonEnvironmentDDBRecord withHashKeyAndRangeKey(
+      final String environmentName, final String accountId, final String environmentVersion) {
 
-  @DynamoDBRangeKey(attributeName = ENVIRONMENT_NAME_SORT_KEY)
-  private String environmentName;
+    return DaemonEnvironmentDDBRecord.builder()
+        .environmentNameAccountId(createEnvironmentNameAccountId(environmentName, accountId))
+        .environmentVersion(environmentVersion)
+        .build();
+  }
 
-  @DynamoDBVersionAttribute private Long version;
+  public static String createEnvironmentNameAccountId(
+      final String environmentName, final String accountId) {
+    return new StringJoiner("_").add(environmentName).add(accountId).toString();
+  }
+
+  @DynamoDBIgnore
+  public String getEnvironmentName() {
+    return environmentNameAccountId.split("_")[0];
+  }
+
+  @DynamoDBIgnore
+  public String getAccountId() {
+    return environmentNameAccountId.split("_")[1];
+  }
+
+  @DynamoDBHashKey(attributeName = ENVIRONMENT_ACCOUNTID_HASH_KEY)
+  private String environmentNameAccountId;
+
+  @DynamoDBRangeKey(attributeName = ENVIRONMENT_VERSION)
+  private String environmentVersion;
+
+  @DynamoDBVersionAttribute private Long recordVersion;
 
   @DynamoDBTypeConverted(converter = InstantDDBConverter.class)
   private Instant createdTime;
@@ -61,6 +89,7 @@ public class DaemonEnvironmentDDBRecord {
   private Set<String> attributes;
   private String taskDefinitionArn;
 
-  private String status;
-  private String health;
+  @DynamoDBTypeConvertedEnum private EnvironmentStatus status;
+
+  @DynamoDBTypeConvertedEnum private EnvironmentHealth health;
 }

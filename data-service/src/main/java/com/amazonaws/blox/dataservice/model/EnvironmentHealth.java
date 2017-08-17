@@ -14,4 +14,6 @@
  */
 package com.amazonaws.blox.dataservice.model;
 
-public enum EnvironmentHealth {}
+public enum EnvironmentHealth {
+  Healthy
+}

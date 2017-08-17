@@ -18,15 +18,27 @@ dependencyManagement {
 dependencies {
     compileOnly('org.projectlombok:lombok:1.16.18')
 
+    compile project(":data-service-model")
+
     compile(
             'com.amazonaws:aws-java-sdk-dynamodb',
             'com.amazonaws:aws-lambda-java-log4j:1.+',
+
+            'org.apache.commons:commons-lang3:3.6',
+
+            'org.springframework:spring-core:4.3.10.RELEASE',
+            'org.springframework:spring-beans:4.3.10.RELEASE',
+            'org.springframework:spring-context:4.3.10.RELEASE',
+
             'org.slf4j:slf4j-log4j12:1.7.+'
     )
 
     testCompile(
             'junit:junit:4.12',
-            'org.mockito:mockito-core:1.+'
+            'org.mockito:mockito-core:1.+',
+            'org.springframework:spring-test:4.3.10.RELEASE',
+            'org.slf4j:slf4j-api:1.7.+',
+            'org.slf4j:jcl-over-slf4j:1.7.+'
     )
 }
 

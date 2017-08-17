@@ -14,4 +14,7 @@
  */
 package com.amazonaws.blox.dataservice.model;
 
-public enum EnvironmentStatus {}
+public enum EnvironmentStatus {
+  Active,
+  Inactive
+}

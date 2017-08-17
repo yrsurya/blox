@@ -51,12 +51,4 @@ public class DeploymentDDBRecordTranslator {
         .endTime(record.getEndTime())
         .build();
   }
-
-  public static Deployment fromDeploymentDDBIndexRecord(final DeploymentDDBRecord record) {
-    return Deployment.builder()
-        .deploymentId(record.getDeploymentId())
-        .deploymentStatus(record.getDeploymentStatus())
-        .environmentName(record.getEnvironmentName())
-        .build();
-  }
 }

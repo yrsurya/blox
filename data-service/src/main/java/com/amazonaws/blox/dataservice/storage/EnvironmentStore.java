@@ -15,10 +15,15 @@
 package com.amazonaws.blox.dataservice.storage;
 
 import com.amazonaws.blox.dataservice.model.Environment;
+import com.amazonaws.blox.dataservice.exception.StorageException;
 
 public interface EnvironmentStore {
 
-  Environment createEnvironment(Environment environment);
+  Environment createDaemonEnvironment(Environment environment) throws StorageException;
 
-  Environment getEnvironment(String accountId, String name);
+  Environment getDaemonEnvironment(String environmentName, String accountId)
+      throws StorageException;
+
+  Environment getDaemonEnvironment(
+      String environmentName, String accountId, String environmentVersion) throws StorageException;
 }

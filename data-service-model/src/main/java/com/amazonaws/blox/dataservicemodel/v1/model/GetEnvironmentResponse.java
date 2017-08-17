@@ -14,18 +14,26 @@
  */
 package com.amazonaws.blox.dataservicemodel.v1.model;
 
+import java.time.Instant;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
 @Builder
-public class CreateEnvironmentRequest {
+public class GetEnvironmentResponse {
 
+  @NonNull private String environmentVersion;
   @NonNull private String name;
   @NonNull private String accountId;
   @NonNull private String taskDefinition;
   @NonNull private String roleArn;
   @NonNull private InstanceGroup instanceGroup;
   @NonNull private String environmentType;
+  @NonNull private String status;
+  @NonNull private String health;
+  //TODO
+  //private DeploymentConfiguration deploymentConfiguration;
+  @NonNull private Instant createdTime;
+  private Instant lastUpdatedTime;
 }

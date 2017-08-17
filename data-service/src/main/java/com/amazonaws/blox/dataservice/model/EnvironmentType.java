@@ -14,4 +14,6 @@
  */
 package com.amazonaws.blox.dataservice.model;
 
-public enum EnvironmentType {}
+public enum EnvironmentType {
+  Daemon
+}

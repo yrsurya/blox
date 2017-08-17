@@ -12,15 +12,15 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.blox.dataservicemodel.v1.exception;
+package com.amazonaws.blox.dataservice.exception;
 
-public class ServiceException extends Exception {
+public class StorageException extends Exception {
 
-  public ServiceException(String message) {
+  public StorageException(String message) {
     super(message);
   }
 
-  public ServiceException(Throwable t) {
-    super(t);
+  public StorageException(String message, Throwable t) {
+    super(message, t);
   }
 }

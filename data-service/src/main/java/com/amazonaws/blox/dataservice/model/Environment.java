@@ -14,25 +14,26 @@
  */
 package com.amazonaws.blox.dataservice.model;
 
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
-
 import java.time.Instant;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
-@Value
+@Data
 @Builder
 public class Environment {
 
   @NonNull private String accountId;
   @NonNull private String name;
-  @NonNull private String taskDefinitionArn;
-  @NonNull private String roleArn;
-  @NonNull private InstanceGroup instanceGroup;
-  @NonNull private EnvironmentStatus status;
-  @NonNull private EnvironmentHealth health;
-  @NonNull private EnvironmentType type;
-  @NonNull private DeploymentConfiguration deploymentConfiguration;
-  @NonNull private Instant createdTime;
-  @NonNull private Instant lastUpdatedTime;
+  private String taskDefinitionArn;
+  private String roleArn;
+  private InstanceGroup instanceGroup;
+  private EnvironmentType type;
+  private EnvironmentStatus status;
+  private EnvironmentHealth health;
+  //TODO: add to ddb record
+  private DeploymentConfiguration deploymentConfiguration;
+  private Instant createdTime;
+  private Instant lastUpdatedTime;
+  private String environmentVersion;
 }
