@@ -22,7 +22,7 @@ import lombok.Value;
 @Builder
 public class StartDeploymentRequest {
 
-  @NonNull private final String environmentName;
-
-  @NonNull private final String environmentVersion;
+  @NonNull private String environmentName;
+  @NonNull private String environmentVersion;
+  @NonNull private String accountId;
 }

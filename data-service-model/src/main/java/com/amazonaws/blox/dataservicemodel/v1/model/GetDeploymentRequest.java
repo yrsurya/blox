@@ -12,11 +12,15 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.blox.dataservicemodel.v1.exception;
+package com.amazonaws.blox.dataservicemodel.v1.model;
 
-public class EnvironmentVersionNotFoundException extends Exception {
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-  public EnvironmentVersionNotFoundException(String message) {
-    super(message);
-  }
+@Value
+@Builder
+public class GetDeploymentRequest {
+
+  @NonNull private String deploymentId;
 }

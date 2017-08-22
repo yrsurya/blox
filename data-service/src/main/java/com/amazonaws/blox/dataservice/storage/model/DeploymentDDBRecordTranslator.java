@@ -22,7 +22,10 @@ public class DeploymentDDBRecordTranslator {
     return DeploymentDDBRecord.builder()
         .deploymentId(deployment.getDeploymentId())
         .deploymentStatus(deployment.getDeploymentStatus())
-        .environmentName(deployment.getEnvironmentName())
+        .environmentNameAccountId(
+            DeploymentDDBRecord.createEnvironmentNameAccountId(
+                deployment.getEnvironmentName(), deployment.getAccountId()))
+        .environmentVersion(deployment.getEnvironmentVersion())
         .deploymentType(deployment.getDeploymentType())
         .createdTime(deployment.getCreatedTime())
         .lastUpdatedTime(deployment.getLastUpdatedTime())
@@ -44,6 +47,8 @@ public class DeploymentDDBRecordTranslator {
         .deploymentId(record.getDeploymentId())
         .deploymentStatus(record.getDeploymentStatus())
         .environmentName(record.getEnvironmentName())
+        .accountId(record.getAccountId())
+        .environmentVersion(record.getEnvironmentVersion())
         .deploymentType(record.getDeploymentType())
         .createdTime(record.getCreatedTime())
         .lastUpdatedTime(record.getLastUpdatedTime())

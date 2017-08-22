@@ -14,16 +14,18 @@
  */
 package com.amazonaws.blox.dataservice.storage;
 
-import com.amazonaws.blox.dataservice.model.Environment;
 import com.amazonaws.blox.dataservice.exception.StorageException;
+import com.amazonaws.blox.dataservice.model.Environment;
+import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
 
 public interface EnvironmentStore {
 
   Environment createDaemonEnvironment(Environment environment) throws StorageException;
 
   Environment getDaemonEnvironment(String environmentName, String accountId)
-      throws StorageException;
+      throws StorageException, EnvironmentNotFoundException;
 
   Environment getDaemonEnvironment(
-      String environmentName, String accountId, String environmentVersion) throws StorageException;
+      String environmentName, String accountId, String environmentVersion)
+      throws StorageException, EnvironmentNotFoundException;
 }

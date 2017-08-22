@@ -14,21 +14,23 @@
  */
 package com.amazonaws.blox.dataservice.storage;
 
+import com.amazonaws.blox.dataservice.exception.StorageException;
 import com.amazonaws.blox.dataservice.model.Deployment;
 import com.amazonaws.blox.dataservice.model.DeploymentStatus;
 
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import java.util.List;
 
 public interface DeploymentStore {
 
-  Deployment createDeployment(Deployment deployment);
+  Deployment createDeployment(Deployment deployment) throws StorageException;
 
   Deployment updateDeployment(Deployment deployment);
 
   // POC test method
-  void deleteAllDeployments();
+  void deleteAllDeployments() throws StorageException;
 
-  Deployment getDeploymentById(String deploymentId);
+  Deployment getDeploymentById(String deploymentId) throws DeploymentDoesNotExist, StorageException;
 
   List<Deployment> getDeploymentsByStatus(DeploymentStatus status);
 

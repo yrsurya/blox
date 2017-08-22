@@ -17,6 +17,7 @@ package com.amazonaws.blox.dataservice.api;
 import static org.junit.Assert.assertEquals;
 
 import com.amazonaws.blox.dataservice.Application;
+import com.amazonaws.blox.dataservicemodel.v1.client.DataService;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentExistsException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.InvalidParameterException;
@@ -38,7 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(classes = {Application.class})
 public class EnvironmentIntegTest {
 
-  @Autowired private DataServiceApi dataServiceApi;
+  @Autowired private DataService dataServiceApi;
 
   @Test
   public void createAndGetEnvironment()
@@ -65,24 +66,24 @@ public class EnvironmentIntegTest {
     final GetEnvironmentResponse getEnvironmentResponse =
         dataServiceApi.getEnvironment(getEnvironmentRequest);
     assertInstanceGroup(
-        getEnvironmentResponse.getInstanceGroup(), createEnvironmentRequest.getInstanceGroup());
-    assertEquals(getEnvironmentResponse.getName(), createEnvironmentRequest.getName());
-    assertEquals(getEnvironmentResponse.getRoleArn(), createEnvironmentRequest.getRoleArn());
-    assertEquals(getEnvironmentResponse.getAccountId(), createEnvironmentRequest.getAccountId());
+        createEnvironmentRequest.getInstanceGroup(), getEnvironmentResponse.getInstanceGroup());
+    assertEquals(createEnvironmentRequest.getName(), getEnvironmentResponse.getName());
+    assertEquals(createEnvironmentRequest.getRoleArn(), getEnvironmentResponse.getRoleArn());
+    assertEquals(createEnvironmentRequest.getAccountId(), getEnvironmentResponse.getAccountId());
     assertEquals(
-        getEnvironmentResponse.getEnvironmentType(), createEnvironmentRequest.getEnvironmentType());
+        createEnvironmentRequest.getEnvironmentType(), getEnvironmentResponse.getEnvironmentType());
     assertEquals(
-        getEnvironmentResponse.getTaskDefinition(), createEnvironmentRequest.getTaskDefinition());
+        createEnvironmentRequest.getTaskDefinition(), getEnvironmentResponse.getTaskDefinition());
   }
 
   private void assertInstanceGroup(final InstanceGroup expected, final InstanceGroup result) {
     assertEquals(expected.getClusterArn(), result.getClusterArn());
     if (expected.getAttributes() == null) {
       if (result.getAttributes() != null && !result.getAttributes().isEmpty()) {
-        assertEquals(expected.getAttributes(), result.getAttributes());
-      } else {
         Assert.fail("Expected attributes to be null or empty");
       }
+    } else {
+      assertEquals(expected.getAttributes(), result.getAttributes());
     }
   }
 }

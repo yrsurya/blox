@@ -19,9 +19,11 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.blox.dataservice.exception.StorageException;
 import com.amazonaws.blox.dataservice.model.Deployment;
 import com.amazonaws.blox.dataservice.model.DeploymentStatus;
 import com.amazonaws.blox.dataservice.model.DeploymentType;
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -47,7 +49,7 @@ public class DDBModelIntegTest {
   }
 
   @Test
-  public void testSparseDeploymentStatusIndex() {
+  public void testSparseDeploymentStatusIndex() throws StorageException, DeploymentDoesNotExist {
     deploymentDDBStore.deleteAllDeployments();
 
     Deployment deployment = createDeployment();
@@ -81,6 +83,8 @@ public class DDBModelIntegTest {
     return Deployment.builder()
         .deploymentId(UUID.randomUUID().toString())
         .environmentName("test")
+        .environmentVersion("1")
+        .accountId("1234")
         .createdTime(Instant.now())
         .deploymentType(DeploymentType.UserInitiated)
         .lastUpdatedTime(Instant.now())

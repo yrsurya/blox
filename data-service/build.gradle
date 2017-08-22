@@ -1,4 +1,5 @@
 plugins {
+    id 'net.ltgt.apt' version '0.11'
     id "io.spring.dependency-management" version "1.0.3.RELEASE"
     id "java"
 }
@@ -11,13 +12,34 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.173'
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.180'
+    }
+    dependencies {
+        dependencySet(group: 'org.slf4j', version: '1.7.+') {
+            entry 'slf4j-api'
+            entry 'slf4j-log4j12'
+            entry 'jcl-over-slf4j'
+        }
+        dependencySet(group: 'org.springframework', version: '4.3.10.RELEASE') {
+            entry 'spring-core'
+            entry 'spring-beans'
+            entry 'spring-context'
+            entry 'spring-test'
+        }
+        dependencySet(group: 'org.mapstruct', version: '1.2.0.CR1') {
+            entry 'mapstruct-jdk8'
+            entry 'mapstruct-processor'
+        }
     }
 }
 
-dependencies {
-    compileOnly('org.projectlombok:lombok:1.16.18')
+compileJava {
+    options.compilerArgs = [
+            '-Amapstruct.defaultComponentModel=spring'
+    ]
+}
 
+dependencies {
     compile project(":data-service-model")
 
     compile(
@@ -26,20 +48,26 @@ dependencies {
 
             'org.apache.commons:commons-lang3:3.6',
 
-            'org.springframework:spring-core:4.3.10.RELEASE',
-            'org.springframework:spring-beans:4.3.10.RELEASE',
-            'org.springframework:spring-context:4.3.10.RELEASE',
+            'org.projectlombok:lombok:1.16.18',
+            'org.mapstruct:mapstruct-jdk8',
 
-            'org.slf4j:slf4j-log4j12:1.7.+'
+            'org.springframework:spring-core',
+            'org.springframework:spring-beans',
+            'org.springframework:spring-context',
+
+            'org.slf4j:slf4j-log4j12'
     )
 
     testCompile(
             'junit:junit:4.12',
             'org.mockito:mockito-core:1.+',
-            'org.springframework:spring-test:4.3.10.RELEASE',
-            'org.slf4j:slf4j-api:1.7.+',
-            'org.slf4j:jcl-over-slf4j:1.7.+'
+            'org.springframework:spring-test',
+            'org.slf4j:slf4j-api',
+            'org.slf4j:jcl-over-slf4j'
     )
+
+    apt 'org.mapstruct:mapstruct-processor'
+    apt 'org.projectlombok:lombok:1.16.18'
 }
 
 sourceSets {
@@ -60,7 +88,7 @@ dependencies {
     integTestRuntime configurations.testRuntime
 }
 
-task integTests(type: Test) {
+task integTests(type: Test, dependsOn: build) {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     description = 'Runs the integration tests.'
 
@@ -68,8 +96,6 @@ task integTests(type: Test) {
 
     testClassesDirs = sourceSets.integTest.output.classesDirs
     classpath = sourceSets.integTest.runtimeClasspath
-
-    binResultsDir = file("$buildDir/integration-test-results/binary/integTest")
 }
 
 test {

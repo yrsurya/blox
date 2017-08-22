@@ -25,7 +25,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import java.time.Instant;
 import java.util.Set;
-import java.util.StringJoiner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -56,17 +55,17 @@ public class DaemonEnvironmentDDBRecord {
 
   public static String createEnvironmentNameAccountId(
       final String environmentName, final String accountId) {
-    return new StringJoiner("_").add(environmentName).add(accountId).toString();
+    return EnvironmentNameAccountId.createEnvironmentNameAccountId(environmentName, accountId);
   }
 
   @DynamoDBIgnore
   public String getEnvironmentName() {
-    return environmentNameAccountId.split("_")[0];
+    return EnvironmentNameAccountId.getEnvironmentName(environmentNameAccountId);
   }
 
   @DynamoDBIgnore
   public String getAccountId() {
-    return environmentNameAccountId.split("_")[1];
+    return EnvironmentNameAccountId.getAccountId(environmentNameAccountId);
   }
 
   @DynamoDBHashKey(attributeName = ENVIRONMENT_ACCOUNTID_HASH_KEY)

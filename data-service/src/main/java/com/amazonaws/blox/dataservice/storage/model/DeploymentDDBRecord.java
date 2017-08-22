@@ -17,17 +17,17 @@ package com.amazonaws.blox.dataservice.storage.model;
 import com.amazonaws.blox.dataservice.model.DeploymentStatus;
 import com.amazonaws.blox.dataservice.model.DeploymentType;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.Instant;
 
 @DynamoDBTable(tableName = "Deployments")
 @Data
@@ -40,6 +40,7 @@ public class DeploymentDDBRecord {
   public static final String DEPLOYMENT_STATUS_GSI_NAME =
       "deploymentStatus-environmentName-index-copy";
   public static final String DEPLOYMENT_STATUS_INDEX_HASH_KEY = "deploymentStatus";
+  //TODO: fix name to environmentNameAccountId
   public static final String DEPLOYMENT_STATUS_INDEX_SORT_KEY = "environmentName";
 
   @Deprecated
@@ -53,6 +54,31 @@ public class DeploymentDDBRecord {
 
   public static DeploymentDDBRecord withIndexHashKey(final DeploymentStatus deploymentStatus) {
     return DeploymentDDBRecord.builder().deploymentStatus(deploymentStatus).build();
+  }
+
+  public static DeploymentDDBRecord withIndexHashAndRangeKey(
+      final DeploymentStatus deploymentStatus,
+      final String environmentName,
+      final String accountId) {
+    return DeploymentDDBRecord.builder()
+        .deploymentStatus(deploymentStatus)
+        .environmentNameAccountId(createEnvironmentNameAccountId(environmentName, accountId))
+        .build();
+  }
+
+  public static String createEnvironmentNameAccountId(
+      final String environmentName, final String accountId) {
+    return EnvironmentNameAccountId.createEnvironmentNameAccountId(environmentName, accountId);
+  }
+
+  @DynamoDBIgnore
+  public String getEnvironmentName() {
+    return EnvironmentNameAccountId.getEnvironmentName(environmentNameAccountId);
+  }
+
+  @DynamoDBIgnore
+  public String getAccountId() {
+    return EnvironmentNameAccountId.getAccountId(environmentNameAccountId);
   }
 
   @DynamoDBHashKey(attributeName = DEPLOYMENT_ID_HASH_KEY)
@@ -69,7 +95,9 @@ public class DeploymentDDBRecord {
     attributeName = DEPLOYMENT_STATUS_INDEX_SORT_KEY,
     globalSecondaryIndexName = DEPLOYMENT_STATUS_GSI_NAME
   )
-  private String environmentName;
+  private String environmentNameAccountId;
+
+  private String environmentVersion;
 
   @DynamoDBTypeConvertedEnum private DeploymentType deploymentType;
 

@@ -14,30 +14,38 @@
  */
 package com.amazonaws.blox.dataservice.storage;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.blox.dataservice.exception.StorageException;
 import com.amazonaws.blox.dataservice.model.Deployment;
 import com.amazonaws.blox.dataservice.model.DeploymentStatus;
 import com.amazonaws.blox.dataservice.storage.model.DeploymentDDBRecord;
 import com.amazonaws.blox.dataservice.storage.model.DeploymentDDBRecordTranslator;
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import org.springframework.stereotype.Component;
 
+@Component
 @AllArgsConstructor
 public class DeploymentDDBStore implements DeploymentStore {
 
   @NonNull private DynamoDBMapper dynamoDBMapper;
 
   @Override
-  public Deployment createDeployment(final Deployment deployment) {
-    final DeploymentDDBRecord record =
-        DeploymentDDBRecordTranslator.toDeploymentDDBRecord(deployment);
-    dynamoDBMapper.save(record);
-    return DeploymentDDBRecordTranslator.fromDeploymentDDBRecord(record);
+  public Deployment createDeployment(final Deployment deployment) throws StorageException {
+    try {
+      final DeploymentDDBRecord record =
+          DeploymentDDBRecordTranslator.toDeploymentDDBRecord(deployment);
+      dynamoDBMapper.save(record);
+      return DeploymentDDBRecordTranslator.fromDeploymentDDBRecord(record);
+    } catch (final AmazonServiceException e) {
+      throw new StorageException(String.format("Could not save deployment %s", deployment));
+    }
   }
 
   @Override
@@ -50,23 +58,35 @@ public class DeploymentDDBStore implements DeploymentStore {
   }
 
   @Override
-  public void deleteAllDeployments() {
+  public void deleteAllDeployments() throws StorageException {
     final DynamoDBScanExpression expression = new DynamoDBScanExpression();
     final List<DeploymentDDBRecord> records =
         dynamoDBMapper.scan(DeploymentDDBRecord.class, expression);
 
     List<DynamoDBMapper.FailedBatch> failedBatch = dynamoDBMapper.batchDelete(records);
     if (!failedBatch.isEmpty()) {
-      //TODO: fix runtime
-      throw new RuntimeException("");
+      //TODO: fix message
+      throw new StorageException("");
     }
   }
 
   @Override
-  public Deployment getDeploymentById(String deploymentId) {
-    final DeploymentDDBRecord record =
-        dynamoDBMapper.load(DeploymentDDBRecord.withHashKey(deploymentId));
-    return DeploymentDDBRecordTranslator.fromDeploymentDDBRecord(record);
+  public Deployment getDeploymentById(String deploymentId)
+      throws DeploymentDoesNotExist, StorageException {
+    try {
+      final DeploymentDDBRecord record =
+          dynamoDBMapper.load(DeploymentDDBRecord.withHashKey(deploymentId));
+
+      if (record == null) {
+        throw new DeploymentDoesNotExist(
+            String.format("Deployment with id %s does not exist", deploymentId));
+      }
+
+      return DeploymentDDBRecordTranslator.fromDeploymentDDBRecord(record);
+    } catch (final AmazonServiceException e) {
+      throw new StorageException(
+          String.format("Could not load deployment with id %s", deploymentId));
+    }
   }
 
   @Override

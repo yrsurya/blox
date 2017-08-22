@@ -15,11 +15,14 @@
 package com.amazonaws.blox.dataserviceclient.v1.client;
 
 import com.amazonaws.blox.dataservicemodel.v1.client.DataService;
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.InvalidParameterException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.ServiceException;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentResponse;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentRequest;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.StartDeploymentRequest;
@@ -41,11 +44,17 @@ public class DataServiceLambdaClient implements DataService {
   @Override
   public GetEnvironmentResponse getEnvironment(GetEnvironmentRequest request)
       throws EnvironmentNotFoundException, InvalidParameterException, ServiceException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public StartDeploymentResponse startDeployment(final StartDeploymentRequest request) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public GetDeploymentResponse getDeployment(GetDeploymentRequest request)
+      throws DeploymentDoesNotExist, InvalidParameterException, ServiceException {
     throw new UnsupportedOperationException();
   }
 }

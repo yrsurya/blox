@@ -14,14 +14,16 @@
  */
 package com.amazonaws.blox.dataservicemodel.v1.client;
 
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentExistsException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
-import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentVersionNotFoundException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentVersionOutdatedException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.InvalidParameterException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.ServiceException;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentResponse;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentRequest;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.StartDeploymentRequest;
@@ -39,6 +41,10 @@ public interface DataService {
 
   /** Creates a deployment record which asynchronously starts a deployment. */
   StartDeploymentResponse startDeployment(StartDeploymentRequest request)
-      throws EnvironmentNotFoundException, EnvironmentVersionNotFoundException,
-          EnvironmentVersionOutdatedException, InvalidParameterException, ServiceException;
+      throws EnvironmentNotFoundException, EnvironmentVersionOutdatedException,
+          InvalidParameterException, ServiceException;
+
+  /** Gets a deployment record by deployment id. */
+  GetDeploymentResponse getDeployment(GetDeploymentRequest request)
+      throws DeploymentDoesNotExist, InvalidParameterException, ServiceException;
 }

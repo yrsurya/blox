@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.blox.dataservice.model;
+package com.amazonaws.blox.dataservicemodel.v1.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -23,20 +23,18 @@ import lombok.NonNull;
 
 @Data
 @Builder
-// required for builder
-@AllArgsConstructor
-// required for mapstruct
 @NoArgsConstructor
-public class Deployment {
+@AllArgsConstructor
+public class GetDeploymentResponse {
 
   @NonNull private String deploymentId;
   @NonNull private String environmentName;
-  @NonNull private DeploymentType deploymentType;
+  @NonNull private String deploymentType;
   @NonNull private Instant createdTime;
   @NonNull private String accountId;
   @NonNull private String environmentVersion;
   private Instant lastUpdatedTime;
-  private DeploymentStatus deploymentStatus;
+  private String deploymentStatus;
   private Instant startTime;
   private Instant endTime;
 }

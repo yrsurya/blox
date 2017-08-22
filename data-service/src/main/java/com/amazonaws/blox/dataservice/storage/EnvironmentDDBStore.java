@@ -20,6 +20,7 @@ import com.amazonaws.blox.dataservice.model.EnvironmentType;
 import com.amazonaws.blox.dataservice.exception.StorageException;
 import com.amazonaws.blox.dataservice.storage.model.DaemonEnvironmentDDBRecord;
 import com.amazonaws.blox.dataservice.storage.model.DaemonEnvironmentDDBRecordTranslator;
+import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -58,24 +59,40 @@ public class EnvironmentDDBStore implements EnvironmentStore {
   }
 
   @Override
-  public Environment getDaemonEnvironment(final String environmentName, final String accountId) {
+  public Environment getDaemonEnvironment(final String environmentName, final String accountId)
+      throws EnvironmentNotFoundException, StorageException {
     //TODO: get latest version
     final String environmentVersion = "1";
 
-    final DaemonEnvironmentDDBRecord record =
-        dynamoDBMapper.load(
-            DaemonEnvironmentDDBRecord.withHashKeyAndRangeKey(
-                environmentName, accountId, environmentVersion));
-    return DaemonEnvironmentDDBRecordTranslator.fromDaemonEnvironmentDDBRecord(record);
+    return getDaemonEnvironment(environmentName, accountId, environmentVersion);
   }
 
   @Override
   public Environment getDaemonEnvironment(
-      final String environmentName, final String accountId, final String environmentVersion) {
-    final DaemonEnvironmentDDBRecord record =
-        dynamoDBMapper.load(
-            DaemonEnvironmentDDBRecord.withHashKeyAndRangeKey(
+      final String environmentName, final String accountId, final String environmentVersion)
+      throws EnvironmentNotFoundException, StorageException {
+    try {
+      final DaemonEnvironmentDDBRecord record =
+          dynamoDBMapper.load(
+              DaemonEnvironmentDDBRecord.withHashKeyAndRangeKey(
+                  environmentName, accountId, environmentVersion));
+
+      if (record == null) {
+        throw new EnvironmentNotFoundException(
+            String.format(
+                "Environment with name %s, account id %s, and version %s was not found",
                 environmentName, accountId, environmentVersion));
-    return DaemonEnvironmentDDBRecordTranslator.fromDaemonEnvironmentDDBRecord(record);
+      }
+
+      return DaemonEnvironmentDDBRecordTranslator.fromDaemonEnvironmentDDBRecord(record);
+    } catch (final AmazonServiceException e) {
+      throw new StorageException(
+          String.format(
+              "Could not load daemon environment with environmentName, accountId and environmentVersion",
+              environmentName,
+              accountId,
+              environmentVersion),
+          e);
+    }
   }
 }

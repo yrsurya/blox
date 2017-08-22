@@ -19,11 +19,13 @@ import com.amazonaws.blox.dataservice.model.Environment;
 import com.amazonaws.blox.dataservice.model.EnvironmentHealth;
 import com.amazonaws.blox.dataservice.model.EnvironmentStatus;
 import com.amazonaws.blox.dataservice.storage.EnvironmentStore;
+import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentExistsException;
+import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
@@ -31,7 +33,8 @@ public class EnvironmentHandler {
 
   @NonNull private EnvironmentStore environmentStore;
 
-  public Environment createEnvironment(final Environment environment) throws StorageException {
+  public Environment createEnvironment(final Environment environment)
+      throws EnvironmentExistsException, StorageException {
 
     //TODO: validate required fields
 
@@ -40,6 +43,8 @@ public class EnvironmentHandler {
     environment.setCreatedTime(Instant.now());
     //TODO: how do we version?
     environment.setEnvironmentVersion("1");
+
+    //TODO: environment exists exception
 
     switch (environment.getType()) {
       case Daemon:
@@ -51,7 +56,8 @@ public class EnvironmentHandler {
     }
   }
 
-  public Environment getEnvironment(final Environment environment) throws StorageException {
+  public Environment getLatestEnvironmentVersion(final Environment environment)
+      throws EnvironmentNotFoundException, StorageException {
 
     Validate.notBlank(environment.getName());
     Validate.notBlank(environment.getAccountId());

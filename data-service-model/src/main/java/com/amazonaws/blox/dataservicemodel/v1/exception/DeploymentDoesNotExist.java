@@ -12,21 +12,11 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazonaws.blox.dataservicemodel.v1.model;
+package com.amazonaws.blox.dataservicemodel.v1.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+public class DeploymentDoesNotExist extends Exception {
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class StartDeploymentResponse {
-
-  @NonNull private String deploymentId;
-  @NonNull private String environmentName;
-  @NonNull private String environmentVersion;
+  public DeploymentDoesNotExist(String message) {
+    super(message);
+  }
 }

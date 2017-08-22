@@ -15,18 +15,24 @@
 package com.amazonaws.blox.dataservice.api;
 
 import com.amazonaws.blox.dataservice.exception.StorageException;
+import com.amazonaws.blox.dataservice.handler.DeploymentHandler;
 import com.amazonaws.blox.dataservice.handler.EnvironmentHandler;
+import com.amazonaws.blox.dataservice.mapper.DeploymentMapper;
+import com.amazonaws.blox.dataservice.model.Deployment;
+import com.amazonaws.blox.dataservice.model.DeploymentType;
 import com.amazonaws.blox.dataservice.model.Environment;
 import com.amazonaws.blox.dataservice.model.EnvironmentTranslator;
 import com.amazonaws.blox.dataservicemodel.v1.client.DataService;
+import com.amazonaws.blox.dataservicemodel.v1.exception.DeploymentDoesNotExist;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentExistsException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentNotFoundException;
-import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentVersionNotFoundException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.EnvironmentVersionOutdatedException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.InvalidParameterException;
 import com.amazonaws.blox.dataservicemodel.v1.exception.ServiceException;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.CreateEnvironmentResponse;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentRequest;
+import com.amazonaws.blox.dataservicemodel.v1.model.GetDeploymentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentRequest;
 import com.amazonaws.blox.dataservicemodel.v1.model.GetEnvironmentResponse;
 import com.amazonaws.blox.dataservicemodel.v1.model.StartDeploymentRequest;
@@ -42,6 +48,8 @@ import org.springframework.stereotype.Component;
 public class DataServiceApi implements DataService {
 
   @NonNull private EnvironmentHandler environmentHandler;
+  @NonNull private DeploymentHandler deploymentHandler;
+  @NonNull private DeploymentMapper deploymentMapper;
 
   @Override
   public CreateEnvironmentResponse createEnvironment(final CreateEnvironmentRequest request)
@@ -57,6 +65,9 @@ public class DataServiceApi implements DataService {
     } catch (final StorageException | IllegalArgumentException e) {
       log.error(e.getMessage(), e);
       throw new ServiceException(e);
+    } catch (final EnvironmentExistsException e) {
+      log.error(e.getMessage(), e);
+      throw e;
     }
   }
 
@@ -68,20 +79,55 @@ public class DataServiceApi implements DataService {
 
     try {
       final Environment environment = EnvironmentTranslator.fromGetEnvironmentRequest(request);
-      final Environment getEnvironment = environmentHandler.getEnvironment(environment);
+      final Environment getEnvironment =
+          environmentHandler.getLatestEnvironmentVersion(environment);
       return EnvironmentTranslator.toGetEnvironmentResponse(getEnvironment);
 
     } catch (final StorageException | IllegalArgumentException e) {
       log.error(e.getMessage(), e);
       throw new ServiceException(e);
+    } catch (final EnvironmentNotFoundException e) {
+      log.error(e.getMessage(), e);
+      throw e;
     }
   }
 
   @Override
   public StartDeploymentResponse startDeployment(StartDeploymentRequest request)
-      throws EnvironmentNotFoundException, EnvironmentVersionNotFoundException,
-          EnvironmentVersionOutdatedException, InvalidParameterException, ServiceException {
+      throws EnvironmentNotFoundException, EnvironmentVersionOutdatedException,
+          InvalidParameterException, ServiceException {
 
-    throw new UnsupportedOperationException("");
+    try {
+      final Deployment deployment = deploymentMapper.startDeploymentRequestToDeployment(request);
+      deployment.setDeploymentType(DeploymentType.UserInitiated);
+
+      final Deployment createdDeployment = deploymentHandler.createDeployment(deployment);
+      return deploymentMapper.deploymentToStartDeploymentResponse(createdDeployment);
+
+    } catch (final StorageException | IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
+      throw new ServiceException(e);
+    } catch (final EnvironmentVersionOutdatedException | EnvironmentNotFoundException e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    }
+  }
+
+  @Override
+  public GetDeploymentResponse getDeployment(GetDeploymentRequest request)
+      throws DeploymentDoesNotExist, InvalidParameterException, ServiceException {
+
+    try {
+      final Deployment deployment = deploymentMapper.getDeploymentRequestToDeployment(request);
+      final Deployment getDeployment = deploymentHandler.getDeployment(deployment);
+      return deploymentMapper.deploymentToGetDeploymentResponse(getDeployment);
+
+    } catch (final StorageException | IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
+      throw new ServiceException(e);
+    } catch (final DeploymentDoesNotExist e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    }
   }
 }
